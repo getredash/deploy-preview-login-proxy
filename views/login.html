@@ -8,56 +8,333 @@
 
   <title>Redash Preview Signin</title>
 
-  <!-- Bootstrap core CSS -->
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO"
-    crossorigin="anonymous">
+  <style>
+    body {
+      display: flex;
+      min-height: 100vh;
+      margin: 0;
+      font-family: arial;
+      font-size: 17px;
+    }
+
+    h1 {
+      font-size: 23px;
+      margin-bottom: 6px;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    body[data-submitting] {
+      pointer-events: none;
+    }
+
+    aside {
+      flex-basis: 470px;
+      background-color: #f0f0f0;
+      padding: 27px;
+      box-sizing: border-box;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      padding: 50px 70px;
+      box-sizing: border-box;
+    }
+
+    #visual {
+      flex-grow: 1;
+      margin-top: 50px;
+    }
+
+    #bottom {
+      text-align: left;
+    }
+
+    small {
+      display: block;
+      color: #7d8c9c;
+      margin-top: 13px;
+    }
+
+    #presets {
+      margin-bottom: 40px;
+    }
+
+    .title {
+      margin-bottom: 10px;
+      position: relative;
+    }
+
+    .profile {
+      display: flex;
+      width: 280px;
+      padding: 10px 15px;
+      border-radius: 3px;
+      transition: background-color 200ms linear;
+    }
+
+    .profile:hover {
+      cursor: pointer;
+    }
+
+    .profile:hover,
+    .profile[data-clicked] {
+      background-color: #f0f0f0;
+    }
+
+    .profile img {
+      width: 99px;
+      height: 99px;
+      border-radius: 50%;
+      margin-right: 15px;
+      border: 5px solid white;
+      background-color: #f0f0f0;
+      transition: border-color 200ms linear;
+    }
+
+    .profile[data-clicked] img {
+      border-color: #007bff;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .name {
+      font-size: 19px;
+    }
+
+    address {
+      font-size: 14px;
+      margin-bottom: 7px;
+    }
+
+    .tag {
+      background-color: #e3e3e3;
+      border-radius: 3px;
+      line-height: 23px;
+      padding: 0 6px;
+      color: #157ffb;
+      font-size: 14px;
+      width: fit-content;
+    }
+
+    form {
+      padding-top: 20px;
+      padding-left: 15px;
+    }
+
+    input {
+      display: block;
+      width: 100%;
+      height: 29px;
+      padding: 19px 10px;
+      font-size: 16px;
+      color: #0e0e0e;
+      background-color: #fff;
+      border: 1px solid #ced4da;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+
+    input::placeholder {
+      color: #ced4da;
+    }
+    
+    form button {
+      color: #fff;
+      background-color: #007bff;
+      border-color: #007bff;
+      cursor: pointer;
+      height: 37px;
+      border-radius: 3px;
+      font-size: 16px;
+      padding: 0 17px;
+      float: right;
+      display: flex;
+    }
+
+    form button svg {
+      animation: rotate 1s ease-out;
+      animation-iteration-count: infinite;
+      margin-right: 4px;
+    }
+
+    body[data-submitting] button {
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    body:not([data-submitting]) button svg {
+      display: none;
+    }
+
+    button#info {
+      border-radius: 50%;
+      height: 18px;
+      width: 18px;
+      padding: 0;
+      font-size: 13px;
+      font-weight: bold;
+      outline: none;
+      display: block;
+      background-color: transparent;
+      color: #007bff;
+      border-color: #007bff;
+      float: right;
+      cursor: pointer;
+    }
+
+    button#info:hover, button#info.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    #tooltip {
+      position: absolute;
+      font-size: 13px;
+      background-color: #f0f0f0;
+      width: 250px;
+      padding: 10px;
+      border-radius: 2px;
+      box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.1);
+      right: -4px;
+      top: -73px;
+    }
+
+    #tooltip span {
+      position: absolute;
+      right: 7px;
+      top: 3px;
+      cursor: pointer;
+    }
+
+    body[data-submitting] #tooltip {
+      display: none;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    @keyframes rotate {
+      from {
+        transform: rotate(0deg);
+      }
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 800px) {
+      #visual {
+        display: none;
+      }
+
+      body {
+        display: initial;
+      }
+
+      aside {
+        text-align: left;
+      }
+    }
+
+  </style>
+
+  <script>
+    function preset(el, user, pass) {
+      el.dataset.clicked = true;
+      document.getElementById('inputEmail').value = user;
+      document.getElementById('inputPassword').value = pass;
+      onSubmit();
+      document.getElementById('loginForm').submit();
+    }
+
+    function onSubmit() {
+      document.body.dataset.submitting = true;
+    }
+
+    function toggleTooltip() {
+      document.getElementById('tooltip').classList.toggle('hide');
+      document.getElementById('info').classList.toggle('active');
+    }
+
+    window.onload = function() {
+      var form = document.getElementById('loginForm');
+      form.addEventListener('submit', onSubmit);
+      form.setAttribute('action', '/login?host=' + window.location.host);
+    }
+  </script>
 </head>
 
-<body class>
-  <div class="container">
-    <div class="row mb-3 mt-3" style="margin: 10px">
-      <div class="col text-center">
-        <img src="https://redash.io/assets/images/elements/redash-logo.svg" alt="logo"/>
+<body>
+  <aside>
+    <h1>Redash Preview Instance</h1>
+    <p>Preview frontend changes in pull requests</p>
+    <div id="visual">
+      <svg width="290px" height="290px" viewBox="0 0 38 35" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <g id="redash-logo" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g id="Group-5" transform="translate(6.000000, 1.000000)" fill-rule="nonzero">
+            <path d="M12,25.3846154 C20.7263387,20.2114164 24.8265686,18.2206014 24.3006897,19.4121704 C23.7748108,20.6037394 19.6745809,25.133016 12,33 L12,25.3846154 Z" id="Shape" fill="#FF7964"></path>
+            <path d="M26,13 C26,20.1864237 20.1850584,26 13,26 C5.81494155,26 0,20.172447 0,13 C0.000240455756,5.82755297 5.81518201,0 13,0 C20.184818,0 26,5.82755297 26,13 Z" id="Shape" fill="#FF7964"></path>
+            <path d="M4.8408991,14.7263528 L6.76088775,14.7263528 C7.22469914,14.7276812 7.60033102,15.0704218 7.60178685,15.4936208 L7.60178685,17.2327321 C7.60033102,17.655931 7.22469914,17.9986716 6.76088775,18 L4.8408991,18 C4.37708771,17.9986716 4.00145583,17.655931 4,17.2327321 L4,15.4936208 C4.0013242,15.0703719 4.37703296,14.7275611 4.8408991,14.7263528 Z M9.28358505,10.8900132 L11.1895909,10.8900132 C11.6534023,10.8913416 12.0290341,11.2340822 12.03049,11.6572811 L12.03049,17.2327321 C12.0290341,17.655931 11.6534023,17.9986716 11.1895909,18 L9.28358505,18 C8.81977367,17.9986716 8.44414179,17.655931 8.44268595,17.2327321 L8.44268595,11.6572811 C8.44401016,11.2340322 8.81971891,10.8912215 9.28358505,10.8900132 Z M13.7122882,13 L15.6322768,13 C16.0960882,13.0013284 16.4717201,13.344069 16.4731759,13.7672679 L16.4731759,17.2327321 C16.4717201,17.655931 16.0960882,17.9986716 15.6322768,18 L13.7122882,18 C13.2484768,17.9986716 12.8728449,17.655931 12.8713891,17.2327321 L12.8713891,13.7672679 C12.8727133,13.344019 13.248422,13.0012083 13.7122882,13 Z M18.2530951,8 L20.1591009,8 C20.6229123,8.00132836 20.9985442,8.344069 21,8.76726793 L21,17.2327321 C20.9985442,17.655931 20.6229123,17.9986716 20.1591009,18 L18.2530951,18 C17.7892837,17.9986716 17.4136518,17.655931 17.412196,17.2327321 L17.412196,8.76726793 C17.4135202,8.34401904 17.7892289,8.00120825 18.2530951,8 Z" id="Shape" fill="#FFFFFF"></path>
+          </g>
+        </g>
+      </svg>
+    </div>
+    <div id="bottom">
+      All preview instances use a single backend, so only frontend changes can be previewed.
+      <small>Backend current version: 7.01 build abc123.</small>
+    </div>
+  </aside>
+  <main>
+    <div class="title">Sign in as:</div>
+    <div id="presets">
+      <div class="profile" onclick="preset(this, 'melissa@acme.com', 'melissa')">
+        <img src="https://randomuser.me/api/portraits/women/50.jpg" alt="Melissa Payne profile pic" />
+        <div class="info">
+          <span class="name">Melissa Payne</span>
+          <address>melissa@acme.com</address>
+          <span class="tag">admin user</span>
+        </div>
+      </div>
+      <div class="profile" onclick="preset(this, 'john@acme.com', 'john1234')">
+        <img src="https://randomuser.me/api/portraits/men/94.jpg" alt="John Smith profile pic" />
+        <div class="info">
+          <span class="name">John Smith</span>
+          <address>john@acme.com</address>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <p>
-          This is the Redash preview service. It allows you to preview frontend changes in pull requests. 
-          Note that it uses a single backend, so only frontend changes can be previewed. 
-        </p>
 
-        <p>
-          To login, you can use the following users:
-        </p>
-
-        <p>
-          <strong>Admin User</strong>: melissa@acme.com (password: melissa)<br/>
-          <strong>Regular User</strong>: john@acme.com (password: john1234)<br/>
-        </p>
-
-        <p>
-          If you plan on using this often we recommend creating your own user (just login as admin).
-        </p>
-      </div>
-      <div class="col">
-        <form class="form-signin" method="post" action="/login" name="login" id="loginForm">
-          <h3 class="mb-3 font-weight-bold">Please sign in</h3>
-          <label for="inputEmail" class="sr-only">Email address</label>
-          <input name="email" type="email" id="inputEmail" class="form-control" placeholder="Email address" required
-            autofocus>
-          <label for="inputPassword" class="sr-only">Password</label>
-          <input name="password" type="password" id="inputPassword" class="form-control mt-1" placeholder="Password"
-            required>
-          <button class="btn btn-primary btn-block mt-1" type="submit">Sign in</button>
-        </form>
+    <div class="title">
+      or other account:
+      <button id="info" onclick="toggleTooltip()">i</button>
+      <div id="tooltip" class="hide">
+        <span onclick="toggleTooltip()">x</span>
+        To add an account, sign in as the admin user above and create a new user for yourself via "Settings > Users".
       </div>
     </div>
-  </div>
+    
+    <form method="post" action="/login" name="login" id="loginForm" onsubmit="onSubmit">
+      <input name="email" type="email" id="inputEmail" placeholder="Email address" required autofocus>
+      <input name="password" type="password" id="inputPassword" placeholder="Password" required>
+      <button type="submit" id="submitButton">
+        <svg width="18" height="18" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+          <circle cx="50" cy="50" fill="none" stroke="#ffffff" stroke-width="10" r="35" stroke-dasharray="164.93361431346415 56.97787143782138"></circle>
+        </svg>
+        Sign in
+      </button>
+    </form>
+  </main>
 </body>
-<script>
-  var loginForm = document.getElementById('loginForm');
-  loginForm.action = '/login?host=' + location.host;
-</script>
 
 </html>
