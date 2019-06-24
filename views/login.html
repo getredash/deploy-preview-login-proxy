@@ -267,15 +267,11 @@
       document.getElementById('info').classList.toggle('active');
     }
 
-    function getNext() {
-      var next = /next=(.*)/.exec(window.location.search); // assuming only search param
-      return next ? '&next=' + next[1] : '';
-    }
-
     window.onload = function() {
       var form = document.getElementById('loginForm');
+      var inputHost = document.getElementById('inputHost');
       form.addEventListener('submit', onSubmit);
-      form.setAttribute('action', '/login?host='+ window.location.host + getNext());
+      inputHost.value = window.location.host;
     }
   </script>
 </head>
@@ -329,7 +325,8 @@
       </div>
     </div>
     
-    <form method="post" action="/login" name="login" id="loginForm" onsubmit="onSubmit">
+    <form method="post" name="login" id="loginForm" onsubmit="onSubmit">
+      <input name="host" type="hidden" id="inputHost">
       <input name="email" type="email" id="inputEmail" placeholder="Email address" required autofocus>
       <input name="password" type="password" id="inputPassword" placeholder="Password" required>
       <button type="submit" id="submitButton">
