@@ -267,10 +267,15 @@
       document.getElementById('info').classList.toggle('active');
     }
 
+    function getNext() {
+      var next = /next=(.*)/.exec(window.location.search); // assuming only search param
+      return next ? '&next=' + next[1] : '';
+    }
+
     window.onload = function() {
       var form = document.getElementById('loginForm');
       form.addEventListener('submit', onSubmit);
-      form.setAttribute('action', '/login?host=' + window.location.host);
+      form.setAttribute('action', '/login?host='+ window.location.host + getNext());
     }
   </script>
 </head>
