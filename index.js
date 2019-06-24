@@ -19,7 +19,7 @@ app.get('/', (req, res) => {
 });
 
 var onProxyReq = function (proxyReq, req, res) {
-    const host = req.query.host || req.headers.host;
+    const host = req.query.host || (req.body && req.body.host) || req.headers.host;
     console.log(req.query.host);
     console.log('host', host);
     proxyReq.setHeader('x-login-host', host);
