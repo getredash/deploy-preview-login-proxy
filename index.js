@@ -3,7 +3,8 @@ const proxy = require('http-proxy-middleware');
 
 var app = express();
 
-app.use(express.static('public'))
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
 app.engine('html', require('ejs').renderFile);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'html');
